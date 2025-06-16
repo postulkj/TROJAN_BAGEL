@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+echo "run_scipt is runnnig"
+mndo99
+echo "run_script is endding"
