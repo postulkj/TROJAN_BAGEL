@@ -4,9 +4,7 @@ ibead=$1
 natom=$2
 QMnatom=$3
 
-
-echo "run_scipt is runnnig natom=${natom}, QMnatom=${QMnatom}"
-
+#head of thje file and basis set
 cat > bagel.json << EOF
 { "bagel" : [
     
@@ -16,11 +14,13 @@ cat > bagel.json << EOF
   "df_basis" : "cc-pvdz-jkfit",
   "angstrom" : "true",
   "geometry" : [
-
 EOF
 
-awk '{print "    { \"atom\" : ""\""$1"\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "]},"}' geom.dat.$ibead >> bagel.json
-tail -n+2 CHEMSH/pointcharges.xyz | awk '{print "    { \"atom\" : ""\"Q\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "], \"charge\" : " $1 "},"}' >> bagel.json
+head -n $QMnatom geom.dat.$ibead | awk '{print "    { \"atom\" : ""\""$1"\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "]},"}' >> bagel.json #format he geometry from a file
+tail -n+2 CHEMSH/pointcharges.xyz | awk '{print "    { \"atom\" : ""\"Q\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "], \"charge\" : " $1 "},"}' >> bagel.json #add the point charge
+sed -i '${s/,$//}' bagel.json #remove the very last comma
+
+#specification of the CASSCF
 cat >> bagel.json << EOF
   ]
 },
@@ -42,5 +42,3 @@ cat >> bagel.json << EOF
 ]}
 EOF
 
-
-echo "run_script is endding"
