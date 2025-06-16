@@ -1,6 +1,46 @@
 #!/bin/bash
 
+ibead=$1
+natom=$2
+QMnatom=$3
 
-echo "run_scipt is runnnig"
-mndo99
+
+echo "run_scipt is runnnig natom=${natom}, QMnatom=${QMnatom}"
+
+cat > bagel.json << EOF
+{ "bagel" : [
+    
+{   
+  "title" : "molecule",
+  "basis" : "aug-cc-pcvdz",
+  "df_basis" : "cc-pvdz-jkfit",
+  "angstrom" : "true",
+  "geometry" : [
+
+EOF
+
+awk '{print "    { \"atom\" : ""\""$1"\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "]},"}' geom.dat.$ibead >> bagel.json
+tail -n+2 CHEMSH/pointcharges.xyz | awk '{print "    { \"atom\" : ""\"Q\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "], \"charge\" : " $1 "},"}' >> bagel.json
+cat >> bagel.json << EOF
+  ]
+},
+
+{
+  "title" : "forces",
+  "export" : true,
+  "grads" : [
+  { "title" : "force", "target" : 0 }
+  ],
+  "method" : [ {
+      "title" : "casscf",
+      "nact" : 4,
+      "nclosed" : 6,
+      "nstate" : 4,
+      "maxiter": 250
+   } ]
+}
+]}
+EOF
+
+
 echo "run_script is endding"
