@@ -6,16 +6,18 @@ export OMP_NUM_THREADS=1
 ibead=$1
 natom=$2
 QMnatom=$3
+tocalc=$4
+nstate=$5
 
-
+MMnatom=$( echo "$natom-$QMnatom" | bc )
 #head of thje file and basis set
 cat > bagel.json << EOF
 { "bagel" : [
 
 {
   "title" : "molecule",
-  "basis" : "aug-cc-pvdz",
-  "df_basis" : "cc-pvdz-jkfit",
+  "basis" : "svp",
+  "df_basis" : "svp-jkfit",
   "angstrom" : "true",
   "geometry" : [
 EOF
@@ -31,6 +33,8 @@ head -n $QMnatom ../geom.dat.$ibead | awk '{
 tail -n+2 pointcharges.xyz | awk '{
     printf "    { \"atom\" : \"Q\",  \"xyz\" : [  %.8f,  %.8f,  %.8f ], \"charge\" : %.8f },\n", $2, $3, $4, $1
 }' >> bagel.json
+
+
 
 sed -i '${s/,$//}' bagel.json #remove the very last comma
 
@@ -59,3 +63,29 @@ EOF
 
 /home/srsen/bin/anaconda3/bin/mpirun -np 1 BAGEL bagel.json > bagel.out
 
+
+cat > orca1.engrad << EOF
+#
+# Number of atoms
+#
+EOF
+echo " $QMnatom" >> orca1.engrad
+cat >> orca1.engrad << EOF
+#
+# The current total energy in Eh
+#
+EOF
+head -1 ENERGY.out  >> orca1.engrad
+cat >> orca1.engrad << EOF
+#
+# The current gradient in Eh/bohr
+#
+EOF
+head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $2}' >> orca1.engrad
+head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $3}' >> orca1.engrad
+head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $4}' >> orca1.engrad
+
+echo $MMnatom > orca1.pcgrad
+tail -$MMnatom FORCE*.out | awk '{ print $2 "\t" $3 "\t" $4}' >> orca1.pcgrad
+
+touch orca1.gbw
