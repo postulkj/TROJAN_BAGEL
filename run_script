@@ -1,23 +1,37 @@
 #!/bin/bash
 
+export BAGEL_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+
 ibead=$1
 natom=$2
 QMnatom=$3
 
+
 #head of thje file and basis set
 cat > bagel.json << EOF
 { "bagel" : [
-    
-{   
+
+{
   "title" : "molecule",
-  "basis" : "aug-cc-pcvdz",
+  "basis" : "aug-cc-pvdz",
   "df_basis" : "cc-pvdz-jkfit",
   "angstrom" : "true",
   "geometry" : [
 EOF
 
-head -n $QMnatom geom.dat.$ibead | awk '{print "    { \"atom\" : ""\""$1"\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "]},"}' >> bagel.json #format he geometry from a file
-tail -n+2 CHEMSH/pointcharges.xyz | awk '{print "    { \"atom\" : ""\"Q\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "], \"charge\" : " $1 "},"}' >> bagel.json #add the point charge
+#head -n $QMnatom ../geom.dat.$ibead | awk '{print "    { \"atom\" : ""\""$1"\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "]},"}' >> bagel.json #format he geometry from a file
+#tail -n+2 pointcharges.xyz | awk '{print "    { \"atom\" : ""\"Q\",  \"xyz\" : [  " $2",  "  $3",  "  $4 "], \"charge\" : " $1 "},"}' >> bagel.json #add the point charge
+# Format the geometry from the file with standard decimal notation
+head -n $QMnatom ../geom.dat.$ibead | awk '{
+    printf "    { \"atom\" : \"%s\",  \"xyz\" : [  %.8f,  %.8f,  %.8f ] },\n", $1, $2, $3, $4
+}' >> bagel.json
+
+# Add the point charges with reformatted numbers
+tail -n+2 pointcharges.xyz | awk '{
+    printf "    { \"atom\" : \"Q\",  \"xyz\" : [  %.8f,  %.8f,  %.8f ], \"charge\" : %.8f },\n", $2, $3, $4, $1
+}' >> bagel.json
+
 sed -i '${s/,$//}' bagel.json #remove the very last comma
 
 #specification of the CASSCF
@@ -33,12 +47,15 @@ cat >> bagel.json << EOF
   ],
   "method" : [ {
       "title" : "casscf",
-      "nact" : 4,
-      "nclosed" : 6,
-      "nstate" : 4,
+      "nact" : 6,
+      "nclosed" : 45,
+      "nstate" : 5,
       "maxiter": 250
    } ]
 }
 ]}
 EOF
+
+
+/home/srsen/bin/anaconda3/bin/mpirun -np 1 BAGEL bagel.json > bagel.out
 
