@@ -2,4 +2,19 @@ input.in
 mini_geom.xyz
 mini_vel.xyz
 r.abin
+PES.dat
+SetEnvironment.sh
+energies.dat
+forces.xyz
+geom.dat.*
+job.log
+output
+pop.dat
+radius.dat
+state.dat
+temper.dat
+trojan*.e*
+trojan*.o*
+velocities.xyz
+
 
