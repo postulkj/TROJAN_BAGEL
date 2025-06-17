@@ -16,5 +16,20 @@ temper.dat
 trojan*.e*
 trojan*.o*
 velocities.xyz
+CHEMSH-LZ/bagel.json
+CHEMSH-LZ/bagel.out
+CHEMSH-LZ/casscf.log
+CHEMSH-LZ/conn.dat
+CHEMSH-LZ/ff.dat
+CHEMSH-LZ/geom.c
+CHEMSH-LZ/geom.com
+CHEMSH-LZ/geom.com.out
+CHEMSH-LZ/input.xyz
+CHEMSH-LZ/input001.com
+CHEMSH-LZ/input001.com.out
+CHEMSH-LZ/orca1.inp
+CHEMSH-LZ/orca1.out
+CHEMSH-LZ/param.defs
+CHEMSH-LZ/pointcharges.xyz
 
 
