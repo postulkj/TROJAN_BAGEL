@@ -31,5 +31,17 @@ CHEMSH-LZ/orca1.inp
 CHEMSH-LZ/orca1.out
 CHEMSH-LZ/param.defs
 CHEMSH-LZ/pointcharges.xyz
+CHEMSH-LZ/ENERGY.out
+CHEMSH-LZ/FORCE_0.out
+CHEMSH-LZ/e
+CHEMSH-LZ/g
+CHEMSH-LZ/hybrid.dl_poly.coords
+CHEMSH-LZ/hybrid.orca.coords
+CHEMSH-LZ/orca1.engrad
+CHEMSH-LZ/orca1.gbw
+CHEMSH-LZ/orca1.pcgrad
+CHEMSH-LZ/save.gbw
+ERROR
+energiesQMMM.dat
 
 
