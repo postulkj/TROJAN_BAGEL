@@ -86,6 +86,8 @@ head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print " 
 head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $4}' >> orca1.engrad
 
 echo $MMnatom > orca1.pcgrad
-tail -$MMnatom FORCE*.out | awk '{ print $2 "\t" $3 "\t" $4}' >> orca1.pcgrad
+tail -$MMnatom FORCE*.out | awk '{ printf("  %15.12f  %15.12f  %15.12f\n", $2, $3, $4) }' >> orca1.pcgrad
 
 touch orca1.gbw
+#cp /home/postulka/CHEMSHELL/BAGEL_INTERFACE/ORCA_GRAD/CHEMSH/orca1.pcgrad .
+#cp /home/postulka/CHEMSHELL/BAGEL_INTERFACE//ORCA_GRAD/CHEMSH/orca1.engrad .
