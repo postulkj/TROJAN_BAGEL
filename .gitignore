@@ -43,5 +43,13 @@ CHEMSH-LZ/orca1.pcgrad
 CHEMSH-LZ/save.gbw
 ERROR
 energiesQMMM.dat
+CHEMSH-LZ/MMenergy.dat
+CHEMSH-LZ/QMMMenergy.dat
+CHEMSH-LZ/QMenergy.dat
+CHEMSH-LZ/e.old
+CHEMSH-LZ/g.old
+CHEMSH-LZ/input001.com.out.old
+test
+
 
 
