@@ -13,8 +13,7 @@ MMnatom=$( echo "$natom-$QMnatom" | bc )
 #head of thje file and basis set
 cat > bagel.json << EOF
 { "bagel" : [
-
-{
+  {
   "title" : "molecule",
   "basis" : "svp",
   "df_basis" : "svp-jkfit",
@@ -38,25 +37,55 @@ tail -n+2 pointcharges.xyz | awk '{
 
 sed -i '${s/,$//}' bagel.json #remove the very last comma
 
-#specification of the CASSCF
 cat >> bagel.json << EOF
   ]
 },
+EOF
 
-{
-  "title" : "forces",
-  "export" : true,
-  "grads" : [
-  { "title" : "force", "target" : 0 }
-  ],
-  "method" : [ {
-      "title" : "casscf",
-      "nact" : 6,
-      "nclosed" : 45,
-      "nstate" : 5,
+if [[ -f "orbitals.archive" ]]; then
+    # Load orbitals if the archive file exists
+cat >> bagel.json << EOF
+  {
+    "title" : "load_ref",
+    "file" : "orbitals",
+    "continue_geom" : false
+  },
+EOF
+else
+cat >> bagel.json << EOF
+  {
+    "title" : "rohf"
+  },
+EOF
+fi
+
+
+#specification of the CASSCF
+cat >> bagel.json << EOF
+  {
+    "title" : "forces",
+    "export" : true,
+    "grads" : [
+      {
+        "title": "force",
+        "target": $(echo "$tocalc-1" | bc)
+      }
+    ],
+    "method": [{
+      "title": "casscf",
+      "nspin": 0,
+      "charge": 0,
+      "nstate": 5,
+      "nact": 6,
+      "nclosed": 45,
+      "thresh": 1.0e-8,
       "maxiter": 250
-   } ]
-}
+      }]
+  },
+  {
+    "title": "save_ref",
+    "file": "orbitals"
+  }
 ]}
 EOF
 
@@ -81,9 +110,7 @@ cat >> orca1.engrad << EOF
 # The current gradient in Eh/bohr
 #
 EOF
-head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $2}' >> orca1.engrad
-head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $3}' >> orca1.engrad
-head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{print "     " $4}' >> orca1.engrad
+head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{ print $2 "\n" $3 "\n" $4 }' >> orca1.engrad
 
 echo $MMnatom > orca1.pcgrad
 tail -$MMnatom FORCE*.out | awk '{ printf("  %15.12f  %15.12f  %15.12f\n", $2, $3, $4) }' >> orca1.pcgrad
