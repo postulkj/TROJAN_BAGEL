@@ -112,6 +112,7 @@ cat >> orca1.engrad << EOF
 EOF
 head -n $( echo "$QMnatom+1" | bc ) FORCE*.out | tail -$QMnatom | awk '{ print $2 "\n" $3 "\n" $4 }' >> orca1.engrad
 
+sed -i  '${/^[[:space:]]*$/d;}' FORCE*.out
 echo $MMnatom > orca1.pcgrad
 tail -$MMnatom FORCE*.out | awk '{ printf("  %15.12f  %15.12f  %15.12f\n", $2, $3, $4) }' >> orca1.pcgrad
 
